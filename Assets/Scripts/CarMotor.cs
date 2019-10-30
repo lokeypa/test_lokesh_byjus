@@ -7,17 +7,15 @@ public class CarMotor : MonoBehaviour
     public static float carSpeed = 1f;
     public static CarMotor instance;
 
+    private float carMaxSpeed = 3f;
+    private float carMiSpeed = 0.5f;
+
+
     private void Awake()
     {
         if (instance == null) instance = this;
     }
 
-
-    void Update()
-    {
-        transform.position += (Vector3.right * Time.deltaTime * carSpeed);
-
-    }
 
     public void PerfromButtonAction(PressedButton pressedButton)
     {
@@ -50,12 +48,12 @@ public class CarMotor : MonoBehaviour
     public void Moveupwards(bool isMovingUp)
     {
         if (isMovingUp) {
-            if (transform.position.y > 0.5f) return;
+            if (transform.position.y > 1f) return;
             transform.position += Vector3.up * Time.deltaTime;
          }
         else
         {
-            if (transform.position.y < -1f) return;
+            if (transform.position.y < 0f) return;
             transform.position -= Vector3.up * Time.deltaTime;
         }
     }
@@ -65,18 +63,33 @@ public class CarMotor : MonoBehaviour
         if (isAccelerating)
         {
             carSpeed += 0.25f * Time.deltaTime;
-            CameraMovement.Offset -= 0.5f * Time.deltaTime;
-            if (carSpeed > 2) {
-                carSpeed = 2f;
+            MoveTransformation(2f);
+            if (carSpeed > carMaxSpeed) {
+                carSpeed = carMaxSpeed;
             }
         }
         else
         {
             carSpeed -= 0.25f * Time.deltaTime;
-            CameraMovement.Offset += 0.5f * Time.deltaTime;
-            if (carSpeed < 0.75f)
+            MoveTransformation(-2f);
+            if (carSpeed < carMiSpeed)
             {
-                carSpeed = 0.75f;
+                carSpeed = carMiSpeed;
+            }
+        }
+    }
+
+    private void MoveTransformation(float rate)
+    {
+        Vector3 tempPosition = transform.position;
+        if (Mathf.Abs(tempPosition.x) < 3)
+        {
+            tempPosition.x += rate * Time.deltaTime;
+            transform.position = tempPosition;
+            if(Mathf.Abs(tempPosition.x) > 3)
+            {
+                tempPosition.x = (rate / 2 * 2.95f);
+                transform.position = tempPosition;
             }
         }
     }
